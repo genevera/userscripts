@@ -1,0 +1,17 @@
+PLEASE, READ (last part of) INSTALL chapter.
+This userscript intends to transform a simple html page into a secured one. Many websites have a "https" version (443) but their pages are written for the "http" version (80). This script averts this effect, so you can keep visit the site being secured as would be the web.
+Links and css (page styles) references, forms actions, images and video sources are rewritten before the page is shown if they're hosted on the same domain.
+We avoid this type of error:
+- chrome:  Mixed Content: The page at 'https://[...]' was loaded over HTTPS, but requested an insecure image 'http://[...]'. This content should also be served over HTTPS.
+- firefox: Blocked loading mixed active content "http://[...]"
+
+INSTALL:
+- install greasemonkey, tampermonkey, scriptish or any userscript engine.
+- download and install the script through above engine
+- edit the script to match the targeted website like or you may encounter troubles:
+        **
+        // @include https://*mytargetsite.tld/*
+        **
+
+TODO:
+- test it on other config, websites :-)
