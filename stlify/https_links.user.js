@@ -4,8 +4,21 @@
 // @include     https://*
 // @version     1
 // @run-at      document-start
-// @grant       none
+// @grant       GM_info
 // ==/UserScript==
+
+var info = {
+    script :{
+        includes: []
+}
+};
+info = GM_info.script;
+
+if( info.includes.length < 2 )
+{
+    if( info.includes[ 0 ] == "https://*" )
+        throw( info.localizedName+': you need to modify the @include parameter' );
+}
 
 /* disable logging,  re-enable it with slash-star */
 var console = {
