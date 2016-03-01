@@ -25,8 +25,6 @@ may work well. feedback welcome. Seeking for members in fetlife ? click "filter
     data points ! - a licenced script. You use it under the term of the IDGAD
     licence. Do whatever you want with it. No warranty (even success).
 
-**Happy summer !**
-
 samples:
 
 [
@@ -36,6 +34,12 @@ samples:
 [
     ![bewam.github.io animated example 02 ](https://bewam.github.io/fetlife_all_members_-ASL+role+status_filter-/assets/images/02.gif )
 ](https://bewam.github.io/fetlife_all_members_-ASL+role+status_filter-/assets/images/02.gif )
+
+@
+_February 29th 2016_:
+
+*  fix new html classes. Is fetlife going to v5 ?
+* change update github repository. compact all userscript in a folder. :crossfingers:
 
 @
 _November 11th 2015_:
