@@ -11,7 +11,7 @@
 // ==/UserScript==
 
 // NOTE: comment (change first "/**/" to "/*") for debugging.
-/*console.log = () => {}; /**/
+/**/console = { log: function(){}}; /**/
 
 var useCurrentPageAsDefault = false;
 var onlyWithAvatar = true;
