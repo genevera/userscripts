@@ -3,9 +3,9 @@
 // @namespace   js.userscript.bewam
 // @include     https://www.tumblr.com/dashboard
 // @version     1
+// @updateURL   https://github.com/bewam/userscripts/raw/master/tumblr_dashboard_arrowNavigation/tumblr_dashboard_arrowNavigation.user.js
 // @grant       none
 // ==/UserScript==
-
 
 var selector = '[data-pageable^="post_"]';
 var rootNode = document.querySelector('.l-content');
@@ -19,7 +19,16 @@ var console = {
 function setDefaultPost() {
     return(curr = rootNode.querySelector(selector));
 }
-
+function getCurrentPost(prev) {
+    var list = Array.from(document.querySelectorAll(selector));
+    var l = list.length;
+    for(var i = 1, e; i < l; i++) {
+        e = list[i];
+        if(e.offsetTop >= window.pageYOffset)
+            return list[(prev ? i - 1 : i)];
+    }
+    return list[(l-1)];
+}
 function setNext(e) {
     var p = e.parentNode;
     var next;
@@ -97,22 +106,28 @@ function moveTo(e) {
         console.log(Err);
     }
 }
-
+// function main() {
 curr = setDefaultPost();
 
 document.addEventListener('keydown', function (e) {
     console.log(curr);
     switch(e.keyCode) {
+    case 37: // down
+        break;
     case 38: // up
-        if(!curr) {
-            curr = setDefaultPost();
-        }
+
+            curr = getCurrentPost(true);
+        // if(!curr) {
+        //     curr = getCurrentPost(true);
+        // }
         moveToPrev();
         break;
+    case 39: // right
+        break;
     case 40: // down
-        if(!curr) {
-            curr = setDefaultPost();
-        }
+        // if(!curr) {
+            curr = getCurrentPost();
+        // }
         moveToNext();
         break;
     default:
