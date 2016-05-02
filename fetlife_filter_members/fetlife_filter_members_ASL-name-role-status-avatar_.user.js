@@ -3,27 +3,33 @@
 // @namespace    io.github.bewam
 // @description    greasemonkey script to filter fetlife members when it's possible. Search by name, gender, role, age, location or status.
 // @include      http*://fetlife.com/*
-// @updateURL  https://github.com/bewam/userscripts/raw/master/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
-// @version      1.9.2.20160301
+// @updateURL  https://github.com/bewam/userscripts/raw/es5/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
+// @version      1.9.2.20160501-es5
 // @grant      GM_addStyle
 // @run-at      document-end
 // @require      http://code.jquery.com/jquery-2.1.1.min.js
 // ==/UserScript==
 
+"use strict";
+
 // NOTE: comment (change first "/**/" to "/*") for debugging.
-/**/console = { log: function(){}}; /**/
+/**/console = { log: function log() {} }; /**/
 
 var useCurrentPageAsDefault = false;
 var onlyWithAvatar = true;
 /* care modifing
-* TODO : to be removed:  https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
+* TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
 */
-const FETCH_LATENCY = 1500;
+var FETCH_LATENCY = 1500;
 // jshint ignore: start
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 (function ($) {
-// jshint ignore: end
+    // jshint ignore: end
     // jquery str
-    const Selector = {
+    var Selector = {
         currentPage: 'em.current',
         body: 'body',
         users: 'div.fl-member-card',
@@ -40,126 +46,28 @@ const FETCH_LATENCY = 1500;
             shortDesc: '.fl-member-card__info',
             /** age, gender, role */
             location: 'span.fl-member-card__location',
-            into: 'span.fl-member-card__action span',
+            into: 'span.fl-member-card__action span'
         }
     };
     // script_name avoid name/id conflicts
-    const _STR = 'fetlife_all_members';
-    const ARRAY_GENDER = [
-        'M',
-        'F',
-        'CD/TV',
-        'MtF',
-        'FtM',
-        'TG',
-        'GF',
-        'GQ',
-        'IS',
-        'B',
-        'FEM'
-    ];
-    const ARRAY_GENDER_LABEL = [
-        'Male',
-        'Female',
-        'CD/TV',
-        'Trans-MtF', 'Trans-FtM',
-        'Transgender',
-        'Gender Fluid',
-        'Genderqueer',
-        'Intersex',
-        'Butch',
-        'Femme'
-    ];
-    const ARRAY_ROLE = [
-        'Dom',
-        'Domme',
-        'Switch',
-        'sub',
-        'Master',
-        'Mistress',
-        'slave',
-        'kajira',
-        'kajirus',
-        'Top',
-        'bottom',
-        'Sadist',
-        'Masochist',
-        'Sadomasochist',
-        'Kinkster',
-        'Fetishist',
-        'Swinger',
-        'Hedonist',
-        'Exhibitionist',
-        'Voyeur',
-        'Sensualist',
-        'Princess',
-        'Slut',
-        'Doll',
-        'sissy',
-        'Rigger',
-        'Rope Top',
-        'Rope Bottom',
-        'Rope Bunny',
-        'Spanko',
-        'Spanker',
-        'Spankee',
-        'Furry',
-        'Leather Man',
-        'Leather Woman',
-        'Leather Daddy',
-        'Leather Top',
-        'Leather bottom',
-        'Leather boy',
-        'Leather girl',
-        'Leather Boi',
-        'Bootblack',
-        'Primal',
-        'Primal Predator',
-        'Primal Prey',
-        'Bull',
-        'cuckold',
-        'cuckquean',
-        'Ageplayer',
-        'Daddy',
-        'Mommy',
-        'Big',
-        'Middle',
-        'little',
-        'brat',
-        'babygirl',
-        'babyboy',
-        'pet',
-        'kitten',
-        'pup',
-        'pony',
-        'Evolving',
-        'Exploring',
-        'Vanilla',
-        'Undecided'
-    ];
-    const ARRAY_ROLE_LABEL = ARRAY_ROLE;
-    const ARRAY_INTO_STATUS = [
-        'is into',
-        'is curious about'
-    ];
-    const ARRAY_INTO_ACTIVITY = [
-        'giving',
-        'receiving',
-        'watching',
-        'wearing',
-        'watching others wear',
-        'everything to do with it'
-    ];
+    var _STR = 'fetlife_all_members';
+    var ARRAY_GENDER = ['M', 'F', 'CD/TV', 'MtF', 'FtM', 'TG', 'GF', 'GQ', 'IS', 'B', 'FEM'];
+    var ARRAY_GENDER_LABEL = ['Male', 'Female', 'CD/TV', 'Trans-MtF', 'Trans-FtM', 'Transgender', 'Gender Fluid', 'Genderqueer', 'Intersex', 'Butch', 'Femme'];
+    var ARRAY_ROLE = ['Dom', 'Domme', 'Switch', 'sub', 'Master', 'Mistress', 'slave', 'kajira', 'kajirus', 'Top', 'bottom', 'Sadist', 'Masochist', 'Sadomasochist', 'Kinkster', 'Fetishist', 'Swinger', 'Hedonist', 'Exhibitionist', 'Voyeur', 'Sensualist', 'Princess', 'Slut', 'Doll', 'sissy', 'Rigger', 'Rope Top', 'Rope Bottom', 'Rope Bunny', 'Spanko', 'Spanker', 'Spankee', 'Furry', 'Leather Man', 'Leather Woman', 'Leather Daddy', 'Leather Top', 'Leather bottom', 'Leather boy', 'Leather girl', 'Leather Boi', 'Bootblack', 'Primal', 'Primal Predator', 'Primal Prey', 'Bull', 'cuckold', 'cuckquean', 'Ageplayer', 'Daddy', 'Mommy', 'Big', 'Middle', 'little', 'brat', 'babygirl', 'babyboy', 'pet', 'kitten', 'pup', 'pony', 'Evolving', 'Exploring', 'Vanilla', 'Undecided'];
+    var ARRAY_ROLE_LABEL = ARRAY_ROLE;
+    var ARRAY_INTO_STATUS = ['is into', 'is curious about'];
+    var ARRAY_INTO_ACTIVITY = ['giving', 'receiving', 'watching', 'wearing', 'watching others wear', 'everything to do with it'];
 
-    const marker = {
+    var marker = {
         folded: '&gt;',
         unfolded: 'v'
     };
-    const isFetishesPage = /^\/fetishes/.test(location.pathname);
+    var isFetishesPage = /^\/fetishes/.test(location.pathname);
 
     // NOTE: do not modify unless you know what you're doing.
-    var overlay = (form) =>
-        $(Selector.firstUser).parents('.clearfix:first').prepend(form).length;
+    var overlay = function overlay(form) {
+        return $(Selector.firstUser).parents('.clearfix:first').prepend(form).length;
+    };
 
     /** TODO @class to manage pages */
     // Pagination = {
@@ -193,16 +101,14 @@ const FETCH_LATENCY = 1500;
     /* store user html block index is shared with mCache */
     /* todo */
     var members = [],
-        /** NOTE mCache = ARRAY( { n° index: { [0]'name':'', [1]'age':XX, [2]'gender':WW, [3]'role':'', [4]'location':'', [5]url:'', [6]"hasAvatar":boolean } }) */
-        mCache = [],
+
+    /** NOTE mCache = ARRAY( { n° index: { [0]'name':'', [1]'age':XX, [2]'gender':WW, [3]'role':'', [4]'location':'', [5]url:'', [6]"hasAvatar":boolean } }) */
+    mCache = [],
         listContainers = [] // columns where lists appear
     ;
     //TODO Expressions =
-    var userRegExp = new RegExp('([0-9]{2})(' + ARRAY_GENDER.join('|') +
-        ')? (' +
-        ARRAY_ROLE.join('|') + ')?', 'i');
-    var regInto = new RegExp('^(' + ARRAY_INTO_STATUS.join('|') +
-        ') ?(.*$)?');
+    var userRegExp = new RegExp('([0-9]{2})(' + ARRAY_GENDER.join('|') + ')? (' + ARRAY_ROLE.join('|') + ')?', 'i');
+    var regInto = new RegExp('^(' + ARRAY_INTO_STATUS.join('|') + ') ?(.*$)?');
 
     /** modified, value, default value */
     var filters = {
@@ -214,7 +120,7 @@ const FETCH_LATENCY = 1500;
         'LocContains': [false, '', ''],
         'IntoStatus': [false, '', ''],
         'IntoActivity': [false, '', '']
-            // has_avatar: @see function
+        // has_avatar: @see function
     };
 
     var ajaxLocked = false,
@@ -222,32 +128,11 @@ const FETCH_LATENCY = 1500;
         stopped = false;
 
     /* jshint ignore:start */
-    GM_addStyle(
-        '#' + S('Wrapper') + ' { ' +
-        //     'background-color: rgba(255, 255, 255, 0.4);' +
-        'border: solid 2px lightgray;' +
-        'color: white !important;/**/ ' +
-        'padding:5px;' +
-        'min-height:15px !important;' +
-        'vertical-align:middle;' +
-        'margin-bottom: 10px;' +
-        '} ' +
-        '#' + S('Controls') + ' { ' +
-        'display: block;/**/ ' +
-        'min-height:15px !important;' +
-        '}' +
-        '#' + S('Content') + ' { ' +
-        'display: none;/**/ ' +
-        'margin-top: 5px;' +
-        '}' +
-        '#' + S('Buttons') + '{ ' +
-        'margin-top: 10px;' +
-        '}' +
-        '#' + S('ButtonStop') + '{ ' +
-        // 'display: none;' +
-        '}' +
-        ''
-    );
+    GM_addStyle('#' + S('Wrapper') + ' { ' +
+    //     'background-color: rgba(255, 255, 255, 0.4);' +
+    'border: solid 2px lightgray;' + 'color: white !important;/**/ ' + 'padding:5px;' + 'min-height:15px !important;' + 'vertical-align:middle;' + 'margin-bottom: 10px;' + '} ' + '#' + S('Controls') + ' { ' + 'display: block;/**/ ' + 'min-height:15px !important;' + '}' + '#' + S('Content') + ' { ' + 'display: none;/**/ ' + 'margin-top: 5px;' + '}' + '#' + S('Buttons') + '{ ' + 'margin-top: 10px;' + '}' + '#' + S('ButtonStop') + '{ ' +
+    // 'display: none;' +
+    '}' + '');
     /* jshint ignore:end */
 
     /*-----------------------------------*/
@@ -256,8 +141,7 @@ const FETCH_LATENCY = 1500;
     function buildOptions(arr1, arr2) {
         var str = '';
         $.each(arr1, function (i, v) {
-            str += '<option value="' + v + '" >' + arr2[i] +
-                '        </option>';
+            str += '<option value="' + v + '" >' + arr2[i] + '        </option>';
         });
         return str;
     }
@@ -265,111 +149,24 @@ const FETCH_LATENCY = 1500;
     function drawBlock() {
         var optionsGender = buildOptions(ARRAY_GENDER, ARRAY_GENDER_LABEL);
         var optionsRole = buildOptions(ARRAY_ROLE, ARRAY_ROLE_LABEL);
-        var optionsIntoStatus = buildOptions(ARRAY_INTO_STATUS,
-            ARRAY_INTO_STATUS);
-        var optionsIntoActivity = buildOptions(ARRAY_INTO_ACTIVITY,
-            ARRAY_INTO_ACTIVITY);
+        var optionsIntoStatus = buildOptions(ARRAY_INTO_STATUS, ARRAY_INTO_STATUS);
+        var optionsIntoActivity = buildOptions(ARRAY_INTO_ACTIVITY, ARRAY_INTO_ACTIVITY);
 
-        var BLOCK =
-            '<div id="' + S('Wrapper') + '"> ' +
-            '    <div id="' + S('Controls') + '">' +
-            '        <b>&gt;</b>&nbsp;' +
-            '        <u>filter members</u>' +
-            '    </div>' +
-            '    <div id="' + S('Content') + '"> ' +
-            '    <div id="' + S('Filters') + '">' +
-            '        <label for="' + S('NameContains') +
-            '">name:&nbsp;&nbsp;&nbsp; </label>' +
-            '        <input id="' + S('NameContains') +
-            '" type="text" class="filter"></input>' +
-            '        <br />' +
-            '        <label for="' + S('LocContains') +
-            '">location:</label>' +
-            '        <input id="' + S('LocContains') +
-            '" type="text" class="filter" ></input>' +
-            '        <br />' +
-            '        <u>age</u>&nbsp;' +
-            '        <label for="' + S('AgeMin') + '">min:</label>' +
-            '        <input id="' + S('AgeMin') +
-            '" type="text" class="filter" size="2"></input>' +
-            '&nbsp; ' +
-            '        <label for="' + S('AgeMax') + '">max:</label>' +
-            '        <input id="' + S('AgeMax') +
-            '" type="text" class="filter" size="2"></input>' +
-            '        <br />' +
-            '        <small>' +
-            '        Use CTRL key to multiple select.' +
-            '        <br />' +
-            '        Use MAJ key to do a range select.' +
-            '        </small>' +
-            '        <br />' +
-            '        <label for="' + S('Gender') + '">gender:</label>' +
-            '        <select id="' + S('Gender') +
-            '" class="filter" name="gender" multiple="multiple" size="3">' +
-            '        <option value="" selected="selected">none specified</option>' +
-            optionsGender +
-            '        </select>' +
-            '        <label for="' + S('Role') + '">role:</label>' +
-            '        <select id="' + S('Role') +
-            '" class="filter" name="role" multiple="multiple" size="5">' +
-            '        <option value="" selected="selected">none specified</option>' +
-            optionsRole +
-            '        </select>';
+        var BLOCK = '<div id="' + S('Wrapper') + '"> ' + '    <div id="' + S('Controls') + '">' + '        <b>&gt;</b>&nbsp;' + '        <u>filter members</u>' + '    </div>' + '    <div id="' + S('Content') + '"> ' + '    <div id="' + S('Filters') + '">' + '        <label for="' + S('NameContains') + '">name:&nbsp;&nbsp;&nbsp; </label>' + '        <input id="' + S('NameContains') + '" type="text" class="filter"></input>' + '        <br />' + '        <label for="' + S('LocContains') + '">location:</label>' + '        <input id="' + S('LocContains') + '" type="text" class="filter" ></input>' + '        <br />' + '        <u>age</u>&nbsp;' + '        <label for="' + S('AgeMin') + '">min:</label>' + '        <input id="' + S('AgeMin') + '" type="text" class="filter" size="2"></input>' + '&nbsp; ' + '        <label for="' + S('AgeMax') + '">max:</label>' + '        <input id="' + S('AgeMax') + '" type="text" class="filter" size="2"></input>' + '        <br />' + '        <small>' + '        Use CTRL key to multiple select.' + '        <br />' + '        Use MAJ key to do a range select.' + '        </small>' + '        <br />' + '        <label for="' + S('Gender') + '">gender:</label>' + '        <select id="' + S('Gender') + '" class="filter" name="gender" multiple="multiple" size="3">' + '        <option value="" selected="selected">none specified</option>' + optionsGender + '        </select>' + '        <label for="' + S('Role') + '">role:</label>' + '        <select id="' + S('Role') + '" class="filter" name="role" multiple="multiple" size="5">' + '        <option value="" selected="selected">none specified</option>' + optionsRole + '        </select>';
 
-        if(isFetishesPage) {
-            BLOCK +=
-                '&nbsp; Into &nbsp;' +
-                '        <select id="' + S('IntoStatus') +
-                '"  multiple="multiple" size="3">' +
-                '        <option value="" selected="selected">All</option>' +
-                optionsIntoStatus +
-                '        </select>' +
-                '        <select id="' + S('IntoActivity') +
-                '" multiple="multiple" size="3">' +
-                '        <option value="" selected="selected">All</option>' +
-                optionsIntoActivity +
-                '        </select>';
+        if (isFetishesPage) {
+            BLOCK += '&nbsp; Into &nbsp;' + '        <select id="' + S('IntoStatus') + '"  multiple="multiple" size="3">' + '        <option value="" selected="selected">All</option>' + optionsIntoStatus + '        </select>' + '        <select id="' + S('IntoActivity') + '" multiple="multiple" size="3">' + '        <option value="" selected="selected">All</option>' + optionsIntoActivity + '        </select>';
         }
 
-        BLOCK +=
-            '        <br />' +
-            // '        <input type="hidden" name="' + S('HasAvatar') +
-            // '" ></input>' +
-            '        <input type="checkbox" id="' + S('HasAvatar') +
-            '" name="' + S(
-                'HasAvatar') + '" checked="' + (onlyWithAvatar ? 'true' :
-                'false') + '"></input>' +
-            '        <label for="' + S('HasAvatar') +
-            '">only with avatar</label>' +
-            '        <br />' +
-            '        <label for="' + S('FromPage') +
-            '">From page:&nbsp;</label>' +
-            '        <input id="' + S('FromPage') +
-            '" type="text" class="filter" size="3" value="' +
-            InputcurrentPageDefaultVal + '"></input>' +
-            '        <input id="' + S('ButtonCurrentPage') +
-            '" type="button" value="current"></input>' +
-            '        <label for="' + S('ToPage') +
-            '"> &nbsp;to page:&nbsp;</label>' +
-            '        <input id="' + S('ToPage') + '" name="' + S('ToPage') +
-            '" type="text" class="filter" size="3"></input>' +
-            '        <br />' +
-            '        <br />' +
-            '    </div> ' + // Filters
-            '    <div id="' + S('Buttons') + '" style="display:inline;">' +
-            '        <input id="' + S('ButtonGo') +
-            '" type="button" value="view&nbsp;all"></input>' +
-            '        <input id="' + S('ButtonStop') +
-            '" type="button" value="&nbsp;stop&nbsp;" disabled="true"></input>' +
-            '    </div>' + // Buttons
-            '    <div id="' + S('Info') + '">' +
-            '        <br />' +
-            '        <span id="' + S('ShowCount') + '">' +
-            '        </span> ' +
-            '    </div> ' + // Info
-            '    </div> ' + //Content
-            '</div>'; // Wrapper
-        if(overlay(BLOCK) < 1) {
+        BLOCK += '        <br />' +
+        // '        <input type="hidden" name="' + S('HasAvatar') +
+        // '" ></input>' +
+        '        <input type="checkbox" id="' + S('HasAvatar') + '" name="' + S('HasAvatar') + '" checked="' + (onlyWithAvatar ? 'true' : 'false') + '"></input>' + '        <label for="' + S('HasAvatar') + '">only with avatar</label>' + '        <br />' + '        <label for="' + S('FromPage') + '">From page:&nbsp;</label>' + '        <input id="' + S('FromPage') + '" type="text" class="filter" size="3" value="' + InputcurrentPageDefaultVal + '"></input>' + '        <input id="' + S('ButtonCurrentPage') + '" type="button" value="current"></input>' + '        <label for="' + S('ToPage') + '"> &nbsp;to page:&nbsp;</label>' + '        <input id="' + S('ToPage') + '" name="' + S('ToPage') + '" type="text" class="filter" size="3"></input>' + '        <br />' + '        <br />' + '    </div> ' + // Filters
+        '    <div id="' + S('Buttons') + '" style="display:inline;">' + '        <input id="' + S('ButtonGo') + '" type="button" value="view&nbsp;all"></input>' + '        <input id="' + S('ButtonStop') + '" type="button" value="&nbsp;stop&nbsp;" disabled="true"></input>' + '    </div>' + // Buttons
+        '    <div id="' + S('Info') + '">' + '        <br />' + '        <span id="' + S('ShowCount') + '">' + '        </span> ' + '    </div> ' + // Info
+        '    </div> ' + //Content
+        '</div>'; // Wrapper
+        if (overlay(BLOCK) < 1) {
             $(Selector.body).prepend(BLOCK);
         }
     }
@@ -428,7 +225,7 @@ const FETCH_LATENCY = 1500;
             parent = $(this).parent().get(0);
             console.log("container: " + $(parent).attr("class"));
 
-            if($.inArray(parent, listContainers) == -1) {
+            if ($.inArray(parent, listContainers) == -1) {
                 listContainers.push(parent);
             }
         });
@@ -439,10 +236,10 @@ const FETCH_LATENCY = 1500;
 
             var name = rS($(this).attr('id'));
             console.log('updating filter: ' + name);
-            if(!filters[name]) {
+            if (!filters[name]) {
                 return;
             }
-            if(typeof filters[name][2] != 'string') {
+            if (typeof filters[name][2] != 'string') {
                 var options = $(this).find('option:selected');
                 filters[name][0] = false;
                 filters[name][1] = [];
@@ -450,17 +247,13 @@ const FETCH_LATENCY = 1500;
                     filters[name][0] = true;
                     filters[name][1].push($(this).val());
                 });
-                if(filters[name][1].length == 1 && filters[name][1]
-                    [0] === '') {
+                if (filters[name][1].length == 1 && filters[name][1][0] === '') {
                     filters[name][0] = false;
                 }
-            }
-            else
-            if(filters[name][2] != $(this).val()) {
+            } else if (filters[name][2] != $(this).val()) {
                 filters[name][0] = true;
                 filters[name][1] = $(this).val();
-            }
-            else {
+            } else {
                 filters[name][0] = false;
                 filters[name][1] = filters[name][2];
             }
@@ -469,7 +262,7 @@ const FETCH_LATENCY = 1500;
     }
 
     function updateAvatarFilter() {
-        onlyWithAvatar = ($I('HasAvatar', ':checked').length > 0);
+        onlyWithAvatar = $I('HasAvatar', ':checked').length > 0;
     }
 
     function updatePaginationFilters() {
@@ -477,13 +270,12 @@ const FETCH_LATENCY = 1500;
         var $fromPage = parseInt($I('FromPage').val());
         var $toPage = parseInt($I('ToPage').val());
 
-
-        if(_fromPage != $fromPage) {
+        if (_fromPage != $fromPage) {
             _fromPage = $fromPage;
             reload = true;
         }
 
-        if(_toPage != $toPage) {
+        if (_toPage != $toPage) {
             _toPage = $toPage;
             reload = true;
         }
@@ -494,7 +286,7 @@ const FETCH_LATENCY = 1500;
         return reload;
     }
     /*-----------------------------------*/
-    var Refining = function (cacheItem) {
+    var Refining = function Refining(cacheItem) {
 
         var c = cacheItem;
         var filtered = false;
@@ -517,29 +309,41 @@ const FETCH_LATENCY = 1500;
             /**/
 
             /**/
-            var functions = [
-                "ageMax",
-                "ageMin",
-                "gender",
-                "hasAvatar",
-                "intoActivity",
-                "intoStatus",
-                "location",
-                "name",
-                "role"
-            ];
-            for(var fn of functions) {
-                // jshint ignore : start
-                eval(fn + '()');
-                // jshint ignore : end
-                if(getF()) {
-                    console.log('is filtered: ' + fn.toString());
-                    console.log(c);
-                    // stop filtering here
-                    return true;
+            var functions = ["ageMax", "ageMin", "gender", "hasAvatar", "intoActivity", "intoStatus", "location", "name", "role"];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = functions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var fn = _step.value;
+
+                    // jshint ignore : start
+                    eval(fn + '()');
+                    // jshint ignore : end
+                    if (getF()) {
+                        console.log('is filtered: ' + fn.toString());
+                        console.log(c);
+                        // stop filtering here
+                        return true;
+                    }
+                }
+                /**/
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
                 }
             }
-            /**/
+
             return filtered;
         };
         /**
@@ -547,7 +351,7 @@ const FETCH_LATENCY = 1500;
          *  @return void(0)
          */
         function setF(F) {
-            if(F) {
+            if (F) {
                 filtered = true;
             }
         }
@@ -562,62 +366,54 @@ const FETCH_LATENCY = 1500;
         */
 
         function ageMax() {
-            if(filters.AgeMax[0]) {
+            if (filters.AgeMax[0]) {
                 setF(c[1] > parseInt(filters.AgeMax[1]));
             }
         }
 
         function ageMin() {
-            if(filters.AgeMin[0]) {
+            if (filters.AgeMin[0]) {
                 setF(c[1] < parseInt(filters.AgeMin[1]));
             }
         }
 
         function gender() {
-            if(filters.Gender[0]) {
+            if (filters.Gender[0]) {
                 setF($.inArray(c[2], filters.Gender[1]) < 0);
             }
         }
 
         function hasAvatar() {
             // console.log('avatar ' + onlyWithAvatar.toString());
-            setF((onlyWithAvatar && !c[6]) ? true : false);
+            setF(onlyWithAvatar && !c[6] ? true : false);
         }
 
         function intoActivity() {
-            if(filters.IntoActivity[0]) {
+            if (filters.IntoActivity[0]) {
                 setF($.inArray(c[8], filters.IntoActivity[1]) < 0);
             }
         }
 
         function intoStatus() {
-            if(filters.IntoStatus[0]) {
-                setF($.inArray(c[7], filters.IntoStatus[1])  < 0);
+            if (filters.IntoStatus[0]) {
+                setF($.inArray(c[7], filters.IntoStatus[1]) < 0);
             }
         }
 
         function location() {
-            if(filters.LocContains[0]) {
-                setF(
-                    c[4].toLowerCase().indexOf(
-                        filters.LocContains[1].toLowerCase()
-                    ) < 0
-                );
+            if (filters.LocContains[0]) {
+                setF(c[4].toLowerCase().indexOf(filters.LocContains[1].toLowerCase()) < 0);
             }
         }
 
         function name() {
-            if(filters.NameContains[0]) {
-                setF(
-                    c[0].toLowerCase().indexOf(
-                        filters.NameContains[1].toLowerCase()
-                    ) < 0
-                );
+            if (filters.NameContains[0]) {
+                setF(c[0].toLowerCase().indexOf(filters.NameContains[1].toLowerCase()) < 0);
             }
         }
 
         function role() {
-            if(filters.Role[0]) {
+            if (filters.Role[0]) {
                 setF($.inArray(c[3], filters.Role[1]) < 0);
             }
         }
@@ -629,8 +425,7 @@ const FETCH_LATENCY = 1500;
         var o;
         var filter = new Refining(mCache[n]);
 
-        return(filter.isFiltered());
-
+        return filter.isFiltered();
     }
     /*-----------Ajax & pagination -----------------*/
     /** @param mixed (str or jQ.), a link "next" in pagination */
@@ -638,32 +433,25 @@ const FETCH_LATENCY = 1500;
         console.log('setNext: ');
         console.log(mix);
         var next = '';
-        if(mix.nodeName === 'A') {
+        if (mix.nodeName === 'A') {
             next = mix.href;
-        }
-        else if(typeof mix == 'string') {
+        } else if (typeof mix == 'string') {
             next = mix;
-        }
-        else if(
-            (typeof mix == 'function' ||
-                typeof mix == 'object') &&
-            $(mix).is('A')
-        ) {
+        } else if ((typeof mix == 'function' || (typeof mix === 'undefined' ? 'undefined' : _typeof(mix)) == 'object') && $(mix).is('A')) {
             next = mix.attr('href');
         }
         _pageNext = next;
-        return(next);
+        return next;
     }
 
     function getNext() {
         console.log(_pageNext);
-        if(_pageNext === '' || _pageNext.match(/^\s*$/)) {
+        if (_pageNext === '' || _pageNext.match(/^\s*$/)) {
             return '';
         }
-        if(_pageNext.indexOf("fetlife.com") < 0) {
+        if (_pageNext.indexOf("fetlife.com") < 0) {
             return 'https://fetlife.com/' + _pageNext;
-        }
-        else {
+        } else {
             return _pageNext;
         }
     }
@@ -674,11 +462,11 @@ const FETCH_LATENCY = 1500;
 
     function getLastPageNum() {
         var $e = $(Selector.nextPage);
-        if($e.length > 0) {
+        if ($e.length > 0) {
             return parseInt($e.prev().text());
         }
         $e = $(Selector.nextDisabled);
-        if($e.length > 0) {
+        if ($e.length > 0) {
             return parseInt($e.prev().text());
         }
         return -1;
@@ -688,19 +476,18 @@ const FETCH_LATENCY = 1500;
         var p = next.lastIndexOf('?');
         var search;
         var S;
-        if(p > -1) {
+        if (p > -1) {
             // url.search W/o leading ?
             search = next.substr(p + 1);
-        }
-        else {
+        } else {
             // no url.search, stop now
             // TODO throw warning
             return true;
         }
         S = search.split('&');
-        for(var i = 0; i < S.length; i++) {
-            if(S[i].substr(0, 5) === 'page=') {
-                return(parseInt(S[i].substr(5)) >= parseInt(_toPage) + 1);
+        for (var i = 0; i < S.length; i++) {
+            if (S[i].substr(0, 5) === 'page=') {
+                return parseInt(S[i].substr(5)) >= parseInt(_toPage) + 1;
             }
         }
         // unknown case, stop now
@@ -711,14 +498,12 @@ const FETCH_LATENCY = 1500;
     function addUrlString(url, pageNb) {
         var S = location.search.toString();
         console.log('location.search: ' + S);
-        if(S.length <= 0) {
+        if (S.length <= 0) {
             return url + "?page=" + pageNb;
         }
-        if(S.indexOf('page=') > -1) {
+        if (S.indexOf('page=') > -1) {
             return url.replace(/page=\d+/, 'page=' + pageNb);
-        }
-        else
-            return url+'&page='+pageNb;
+        } else return url + '&page=' + pageNb;
         // FIXME: return what ? return (url + '&page=' + pageNb);
     }
 
@@ -729,36 +514,31 @@ const FETCH_LATENCY = 1500;
 
         var next;
 
-        if(startPageNo) {
+        if (startPageNo) {
             console.log('start fetching from Page: ' + startPageNo);
-            if(parseInt(startPageNo) > 0) {
+            if (parseInt(startPageNo) > 0) {
                 setNext(addUrlString(location.href, startPageNo));
             }
-        }
-        else {
+        } else {
             startPageNo = false;
         }
 
         next = getNext();
         console.log("trying to fetch: " + next);
 
-        if(
-            next === '' ||
-            next.match(/^\s*$/) ||
-            next === void(0)
-        ) {
+        if (next === '' || next.match(/^\s*$/) || next === void 0) {
             seekingEnded();
             return;
         }
 
-        if(!ajaxLocked) {
+        if (!ajaxLocked) {
             ajaxLocked = true;
             $.ajax({
                 url: next,
                 dataType: 'html',
                 useCache: false,
                 success: onMembersPage,
-                error: function (event) {
+                error: function error(event) {
                     seekingEnded();
                     console.error(event);
                 }
@@ -772,27 +552,22 @@ const FETCH_LATENCY = 1500;
 
         setNext(aNext);
 
-        console.log("next page to fetch: " +
-            getNext());
+        console.log("next page to fetch: " + getNext());
         var users = $(data).find(Selector.users);
 
-        $.each(users, (i, user) => {
+        $.each(users, function (i, user) {
             show(storeUser(user));
         });
 
-        if(!stopped && !isLastFetchedPage(getNext())) {
-            setTimeout(
-                function () {
-                    ajaxLocked = false;
-                    fetchMembers(false);
-                }, (FETCH_LATENCY < 0 ? FETCH_LATENCY : 0)
-            );
-        }
-        else {
+        if (!stopped && !isLastFetchedPage(getNext())) {
+            setTimeout(function () {
+                ajaxLocked = false;
+                fetchMembers(false);
+            }, FETCH_LATENCY < 0 ? FETCH_LATENCY : 0);
+        } else {
             seekingEnded();
         }
     }
-
 
     function showInfo(str) {
         $I('ShowCount').html(str);
@@ -803,12 +578,10 @@ const FETCH_LATENCY = 1500;
     }
 
     function show(n) {
-        if(!filterUser(n)) {
+        if (!filterUser(n)) {
             $(listContainers[alternColumn]).append(members[n]);
             _shownCount++;
-            alternColumn = (alternColumn == (listContainers.length - 1)) ?
-                0 : (
-                    alternColumn + 1);
+            alternColumn = alternColumn == listContainers.length - 1 ? 0 : alternColumn + 1;
         }
     }
     // TODO for 2.0
@@ -831,7 +604,7 @@ const FETCH_LATENCY = 1500;
 
     function storeUser(user) {
         console.log(user);
-        var i = (members.push(user) - 1);
+        var i = members.push(user) - 1;
         // TODO add page num
         var matches = []; /* match: [whole, age (not null), gender, role ] */
         var firstSpan = $(user).find(Selector.user.firstSpan);
@@ -844,15 +617,9 @@ const FETCH_LATENCY = 1500;
         /** profile url */
         C[5] = firstSpan.find(Selector.user.profileLink).attr('href');
         /** hasAvatar, need to be false if user has */
-        C[6] = (avatar.attr('src').indexOf('/images/avatar_missing') < 0) ?
-            true :
-            false;
-            console.log($(user).find(Selector.user.shortDesc))
-        matches = $(user)
-        .find(Selector.user.shortDesc).text()
-        .replace(/\n|\r/g,' ')
-        .replace(/\s{1,}|\n|\r/g,' ')
-        .match(userRegExp);
+        C[6] = avatar.attr('src').indexOf('/images/avatar_missing') < 0 ? true : false;
+        console.log($(user).find(Selector.user.shortDesc));
+        matches = $(user).find(Selector.user.shortDesc).text().replace(/\n|\r/g, ' ').replace(/\s{1,}|\n|\r/g, ' ').match(userRegExp);
         //   console.log("match: "+(M[1]||"")+", "+(M[2]||"")+", "+(M[3]||""));
         /* age */
         C[1] = matches[1];
@@ -863,13 +630,13 @@ const FETCH_LATENCY = 1500;
         /* location*/
         C[4] = $(user).find(Selector.user.location).text() || '';
         /* into */
-        if(isFetishesPage) {
+        if (isFetishesPage) {
             matches = []; /* match: ["into status", "rest aka into activity" ] */
             into = $(user).find(Selector.user.into).text() || '';
-            console.log('into: '+into);
+            console.log('into: ' + into);
             matches = into.match(regInto);
             console.log(matches);
-            if(matches) {
+            if (matches) {
                 C[7] = matches[1] || '';
                 C[8] = matches[2] || '';
             }
@@ -899,7 +666,7 @@ const FETCH_LATENCY = 1500;
     }
     /*--------------helpers---------------*/
     function isInt(n) {
-        return(!isNaN(n));
+        return !isNaN(n);
     }
 
     /*--------------Actions--------------*/
@@ -910,20 +677,14 @@ const FETCH_LATENCY = 1500;
         var $fromPage = $I('FromPage');
 
         /** next_page link and list of members are on current page ? go on */
-        if(($pageNext.length > 0 || $previousPage.length > 0) &&
-            $pageUsers.length > 0
-        ) {
+        if (($pageNext.length > 0 || $previousPage.length > 0) && $pageUsers.length > 0) {
             _clientPageNo = _pageCurrentNo = getCurrentPageNo();
             initContainers($pageUsers);
 
             console.log('_pageCurrentNo :' + _pageCurrentNo);
 
             drawBlock();
-            $I('FromPage').val(
-                useCurrentPageAsDefault ?
-                _pageCurrentNo :
-                1
-            );
+            $I('FromPage').val(useCurrentPageAsDefault ? _pageCurrentNo : 1);
             pageMax = lastPageNumber = getLastPageNum();
             console.log("lastPageNumber: " + lastPageNumber);
             $I('ToPage').val(lastPageNumber);
@@ -933,16 +694,16 @@ const FETCH_LATENCY = 1500;
     }
 
     function showFilterAgain() {
+        var _this = this;
 
         $I('ButtonGo').val("filter\x20again");
         enableAllInput();
 
-        $I('ButtonGo').bind('click', () => {
-            if(updatePaginationFilters()) {
+        $I('ButtonGo').bind('click', function () {
+            if (updatePaginationFilters()) {
                 launchAgain();
-                $(this).unbind('click');
-            }
-            else {
+                $(_this).unbind('click');
+            } else {
                 filterAgain();
             }
         });
@@ -959,7 +720,6 @@ const FETCH_LATENCY = 1500;
         $I('ButtonGo').click(function () {
             $(this).unbind('click');
             launchSearch();
-
         });
         $I('ButtonStop').click(function () {
             // $(this).unbind('click');
@@ -968,7 +728,7 @@ const FETCH_LATENCY = 1500;
     }
 
     function launchSearch() {
-        if(!scriptLaunched) {
+        if (!scriptLaunched) {
             updatePaginationFilters();
             console.log("_fromPage: " + _fromPage);
             console.log("_toPage: " + _toPage);
@@ -995,7 +755,7 @@ const FETCH_LATENCY = 1500;
         updateMemberFilters();
         updateAvatarFilter();
         cleanPage();
-        for(var i = 0; i < members.length; i++) {
+        for (var i = 0; i < members.length; i++) {
             show(i);
         }
         showCount();
@@ -1011,20 +771,16 @@ const FETCH_LATENCY = 1500;
     }
     /* jshint ignore:start */
     var count = 0;
-    if(typeof $ == 'function') {
+    if (typeof $ == 'function') {
         init();
-    }
-    else {
+    } else {
         setTimeout(function () {
-            if(typeof $ !== 'function') {
-                alert('fetlife is modified, script ' +
-                    GM_info.script.name +
-                    'can\'t run please contact the author.');
+            if (typeof $ !== 'function') {
+                alert('fetlife is modified, script ' + GM_info.script.name + 'can\'t run please contact the author.');
             }
         }, 3000);
     }
     /*-----------------------------------*/
-
 })(jQuery);
 jQuery.noConflict(true);
 /* jshint ignore:end */
