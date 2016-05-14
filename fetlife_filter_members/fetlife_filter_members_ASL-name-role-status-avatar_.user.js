@@ -3,11 +3,11 @@
 // @namespace       io.github.bewam
 // @description     greasemonkey script to filter fetlife members when it's possible. Search by name, gender, role, age, location or status.
 // @include         https://fetlife.com/*
-// @include         https://*.fetlife.com/*
 // @updateURL       https://github.com/bewam/userscripts/raw/master/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
 // @version         1.9.2.20160514
 // @grant           GM_addStyle
 // @run-at          document-end
+// @include-jquery  true
 // @require         http://code.jquery.com/jquery-2.1.1.min.js
 // ==/UserScript==
 
