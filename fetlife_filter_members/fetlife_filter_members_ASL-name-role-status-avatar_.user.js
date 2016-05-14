@@ -1,26 +1,29 @@
 // ==UserScript==
-// @name      fetlife_all_members (ASL+role+status filter)
-// @namespace    io.github.bewam
-// @description    greasemonkey script to filter fetlife members when it's possible. Search by name, gender, role, age, location or status.
-// @include      http*://fetlife.com/*
-// @updateURL  https://github.com/bewam/userscripts/raw/master/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
-// @version      1.9.2.20160301
-// @grant      GM_addStyle
-// @run-at      document-end
-// @require      http://code.jquery.com/jquery-2.1.1.min.js
+// @name            fetlife_all_members (ASL+role+status filter)
+// @namespace       io.github.bewam
+// @description     greasemonkey script to filter fetlife members when it's possible. Search by name, gender, role, age, location or status.
+// @include         https://fetlife.com/*
+// @include         https://*.fetlife.com/*
+// @updateURL       https://github.com/bewam/userscripts/raw/master/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
+// @version         1.9.2.20160514
+// @grant           GM_addStyle
+// @run-at          document-end
+// @include-jquery  true
+// @require         http://code.jquery.com/jquery-2.1.1.min.js
 // ==/UserScript==
 
 // NOTE: comment (change first "/**/" to "/*") for debugging.
-/**/console = { log: function(){}}; /**/
+/**/console = { log: ()=>{}}; /**/
 
 var useCurrentPageAsDefault = false;
 var onlyWithAvatar = true;
 /* care modifing
-* TODO : to be removed:  https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
+* TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
 */
 const FETCH_LATENCY = 1500;
 // jshint ignore: start
-(function ($) {
+
++(function ($) {
 // jshint ignore: end
     // jquery str
     const Selector = {
@@ -847,7 +850,7 @@ const FETCH_LATENCY = 1500;
         C[6] = (avatar.attr('src').indexOf('/images/avatar_missing') < 0) ?
             true :
             false;
-            console.log($(user).find(Selector.user.shortDesc))
+            console.log($(user).find(Selector.user.shortDesc));
         matches = $(user)
         .find(Selector.user.shortDesc).text()
         .replace(/\n|\r/g,' ')
@@ -1024,7 +1027,6 @@ const FETCH_LATENCY = 1500;
         }, 3000);
     }
     /*-----------------------------------*/
-
 })(jQuery);
 jQuery.noConflict(true);
 /* jshint ignore:end */
