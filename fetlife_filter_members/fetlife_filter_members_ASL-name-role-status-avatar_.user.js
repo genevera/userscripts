@@ -8,7 +8,6 @@
 // @version         1.9.2.20160514
 // @grant           GM_addStyle
 // @run-at          document-end
-// @include-jquery  true
 // @require         http://code.jquery.com/jquery-2.1.1.min.js
 // ==/UserScript==
 
