@@ -4,8 +4,7 @@
 // @description      greasemonkey script to filter fetlife members when it's possible. Search by name, gender, role, age, location or status.
 // @include          https://fetlife.com/*
 // @updateURL        https://github.com/bewam/userscripts/raw/master/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
-// @version          1.9.2.20160516 /*master*/
-// @grant            GM_addStyle
+// @version          1.9.2.20183004
 // @run-at           document-end
 // @include-jquery   false
 // @use-greasemonkey true
@@ -13,18 +12,18 @@
 // ==/UserScript==
 
 // NOTE: comment (change first "/**/" to "/*") for debugging.
-/**/console = { log: ()=>{}}; /**/
+/*console = { log: ()=>{}}; /**/
 
 var useCurrentPageAsDefault = false;
 var onlyWithAvatar = true;
 /* care modifing
-* TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
-*/
+ * TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
+ */
 const FETCH_LATENCY = 1500;
 // jshint ignore: start
 
 +(function ($) {
-// jshint ignore: end
+    // jshint ignore: end
     // jquery str
     const Selector = {
         currentPage: 'em.current',
@@ -162,7 +161,10 @@ const FETCH_LATENCY = 1500;
 
     // NOTE: do not modify unless you know what you're doing.
     var overlay = (form) =>
-        $(Selector.firstUser).parents('.clearfix:first').prepend(form).length;
+        $(Selector.firstUser)
+        .parents('.clearfix:first')
+        .prepend(form)
+        .length;
 
     /** TODO @class to manage pages */
     // Pagination = {
@@ -217,7 +219,7 @@ const FETCH_LATENCY = 1500;
         'LocContains': [false, '', ''],
         'IntoStatus': [false, '', ''],
         'IntoActivity': [false, '', '']
-            // has_avatar: @see function
+        // has_avatar: @see function
     };
 
     var ajaxLocked = false,
@@ -225,7 +227,7 @@ const FETCH_LATENCY = 1500;
         stopped = false;
 
     /* jshint ignore:start */
-    GM_addStyle(
+    addStyle(
         '#' + S('Wrapper') + ' { ' +
         //     'background-color: rgba(255, 255, 255, 0.4);' +
         'border: solid 2px lightgray;' +
@@ -256,6 +258,7 @@ const FETCH_LATENCY = 1500;
     /*-----------------------------------*/
 
     /*----------------html related--------------------------*/
+
     function buildOptions(arr1, arr2) {
         var str = '';
         $.each(arr1, function (i, v) {
@@ -263,6 +266,14 @@ const FETCH_LATENCY = 1500;
                 '        </option>';
         });
         return str;
+    }
+
+    function addStyle(css) {
+        var newStyleSheet = document.createElement('style');
+        document.body.appendChild(newStyleSheet);
+        newStyleSheet.textContent = css;
+
+        return newStyleSheet;
     }
 
     function drawBlock() {
@@ -373,28 +384,39 @@ const FETCH_LATENCY = 1500;
             '    </div> ' + //Content
             '</div>'; // Wrapper
         if(overlay(BLOCK) < 1) {
-            $(Selector.body).prepend(BLOCK);
+            $(Selector.body)
+                .prepend(BLOCK);
         }
     }
 
     function disableAllInput() {
         // TODO @class Form. Form.disableEntries() => void()
-        $I('Content').find('*').attr("disabled", 'true');
-        $I('ButtonStop').removeAttr("disabled");
+        $I('Content')
+            .find('*')
+            .attr("disabled", 'true');
+        $I('ButtonStop')
+            .removeAttr("disabled");
     }
 
     function enableAllInput() {
-        $I('Content').find('*').removeAttr("disabled");
-        $I('ButtonStop').attr("disabled", 'true');
+        $I('Content')
+            .find('*')
+            .removeAttr("disabled");
+        $I('ButtonStop')
+            .attr("disabled", 'true');
     }
 
     function disableInput() {
         // TODO @function Form.disableEntries() => void()
-        $I('Content').find('*').attr("disabled", 'true');
+        $I('Content')
+            .find('*')
+            .attr("disabled", 'true');
     }
 
     function enableInput() {
-        $I('Content').find('*').removeAttr("disabled");
+        $I('Content')
+            .find('*')
+            .removeAttr("disabled");
     }
     /**
      * @param str id
@@ -414,8 +436,10 @@ const FETCH_LATENCY = 1500;
     }
 
     function cleanPage() {
-        $(Selector.users).remove();
-        $(Selector.pagination).hide();
+        $(Selector.users)
+            .remove();
+        $(Selector.pagination)
+            .hide();
         _shownCount = 0;
     }
 
@@ -427,58 +451,71 @@ const FETCH_LATENCY = 1500;
     /** Would grab 2 containers where to put members in */
     function initContainers(pageUsers) {
         var parent;
-        $(pageUsers).each(function () {
-            parent = $(this).parent().get(0);
-            console.log("container: " + $(parent).attr("class"));
+        $(pageUsers)
+            .each(function () {
+                parent = $(this)
+                    .parent()
+                    .get(0);
+                console.log("container: " + $(parent)
+                    .attr("class"));
 
-            if($.inArray(parent, listContainers) == -1) {
-                listContainers.push(parent);
-            }
-        });
+                if($.inArray(parent, listContainers) == -1) {
+                    listContainers.push(parent);
+                }
+            });
     }
     /*------------------------------------*/
     function updateMemberFilters() {
-        $I('Content').find('select, input[type=text]').each(function () {
+        $I('Content')
+            .find('select, input[type=text]')
+            .each(function () {
 
-            var name = rS($(this).attr('id'));
-            console.log('updating filter: ' + name);
-            if(!filters[name]) {
-                return;
-            }
-            if(typeof filters[name][2] != 'string') {
-                var options = $(this).find('option:selected');
-                filters[name][0] = false;
-                filters[name][1] = [];
-                $(options).each(function () {
-                    filters[name][0] = true;
-                    filters[name][1].push($(this).val());
-                });
-                if(filters[name][1].length == 1 && filters[name][1]
-                    [0] === '') {
-                    filters[name][0] = false;
+                var name = rS($(this)
+                    .attr('id'));
+                console.log('updating filter: ' + name);
+                if(!filters[name]) {
+                    return;
                 }
-            }
-            else
-            if(filters[name][2] != $(this).val()) {
-                filters[name][0] = true;
-                filters[name][1] = $(this).val();
-            }
-            else {
-                filters[name][0] = false;
-                filters[name][1] = filters[name][2];
-            }
-        });
+                if(typeof filters[name][2] != 'string') {
+                    var options = $(this)
+                        .find('option:selected');
+                    filters[name][0] = false;
+                    filters[name][1] = [];
+                    $(options)
+                        .each(function () {
+                            filters[name][0] = true;
+                            filters[name][1].push($(this)
+                                .val());
+                        });
+                    if(filters[name][1].length == 1 && filters[name][1]
+                    [0] === '') {
+                        filters[name][0] = false;
+                    }
+                } else
+                if(filters[name][2] != $(this)
+                    .val()) {
+                    filters[name][0] = true;
+                    filters[name][1] = $(this)
+                        .val();
+                } else {
+                    filters[name][0] = false;
+                    filters[name][1] = filters[name][2];
+                }
+            });
         console.log(filters);
     }
 
     function updateAvatarFilter() {
-        onlyWithAvatar = ($I('HasAvatar', ':checked').length > 0);
+        onlyWithAvatar = ($I('HasAvatar', ':checked')
+            .length > 0);
     }
 
     function updatePaginationFilters() {
         var reload = false;
-        var $fromPage = parseInt($I('FromPage').val());
-        var $toPage = parseInt($I('ToPage').val());
+        var $fromPage = parseInt($I('FromPage')
+            .val());
+        var $toPage = parseInt($I('ToPage')
+            .val());
 
 
         if(_fromPage != $fromPage) {
@@ -595,14 +632,15 @@ const FETCH_LATENCY = 1500;
 
         function intoStatus() {
             if(filters.IntoStatus[0]) {
-                setF($.inArray(c[7], filters.IntoStatus[1])  < 0);
+                setF($.inArray(c[7], filters.IntoStatus[1]) < 0);
             }
         }
 
         function location() {
             if(filters.LocContains[0]) {
                 setF(
-                    c[4].toLowerCase().indexOf(
+                    c[4].toLowerCase()
+                    .indexOf(
                         filters.LocContains[1].toLowerCase()
                     ) < 0
                 );
@@ -612,7 +650,8 @@ const FETCH_LATENCY = 1500;
         function name() {
             if(filters.NameContains[0]) {
                 setF(
-                    c[0].toLowerCase().indexOf(
+                    c[0].toLowerCase()
+                    .indexOf(
                         filters.NameContains[1].toLowerCase()
                     ) < 0
                 );
@@ -643,14 +682,13 @@ const FETCH_LATENCY = 1500;
         var next = '';
         if(mix.nodeName === 'A') {
             next = mix.href;
-        }
-        else if(typeof mix == 'string') {
+        } else if(typeof mix == 'string') {
             next = mix;
-        }
-        else if(
+        } else if(
             (typeof mix == 'function' ||
                 typeof mix == 'object') &&
-            $(mix).is('A')
+            $(mix)
+            .is('A')
         ) {
             next = mix.attr('href');
         }
@@ -665,24 +703,26 @@ const FETCH_LATENCY = 1500;
         }
         if(_pageNext.indexOf("fetlife.com") < 0) {
             return 'https://fetlife.com/' + _pageNext;
-        }
-        else {
+        } else {
             return _pageNext;
         }
     }
 
     function getCurrentPageNo() {
-        return parseInt($(Selector.currentPage).text());
+        return parseInt($(Selector.currentPage)
+            .text());
     }
 
     function getLastPageNum() {
         var $e = $(Selector.nextPage);
         if($e.length > 0) {
-            return parseInt($e.prev().text());
+            return parseInt($e.prev()
+                .text());
         }
         $e = $(Selector.nextDisabled);
         if($e.length > 0) {
-            return parseInt($e.prev().text());
+            return parseInt($e.prev()
+                .text());
         }
         return -1;
     }
@@ -694,8 +734,7 @@ const FETCH_LATENCY = 1500;
         if(p > -1) {
             // url.search W/o leading ?
             search = next.substr(p + 1);
-        }
-        else {
+        } else {
             // no url.search, stop now
             // TODO throw warning
             return true;
@@ -719,9 +758,8 @@ const FETCH_LATENCY = 1500;
         }
         if(S.indexOf('page=') > -1) {
             return url.replace(/page=\d+/, 'page=' + pageNb);
-        }
-        else
-            return url+'&page='+pageNb;
+        } else
+            return url + '&page=' + pageNb;
         // FIXME: return what ? return (url + '&page=' + pageNb);
     }
 
@@ -737,8 +775,7 @@ const FETCH_LATENCY = 1500;
             if(parseInt(startPageNo) > 0) {
                 setNext(addUrlString(location.href, startPageNo));
             }
-        }
-        else {
+        } else {
             startPageNo = false;
         }
 
@@ -760,6 +797,10 @@ const FETCH_LATENCY = 1500;
                 url: next,
                 dataType: 'html',
                 useCache: false,
+                xhrFields: {
+                    mozBackgroundRequest: true,
+                    withCredentials: false
+                },
                 success: onMembersPage,
                 error: function (event) {
                     seekingEnded();
@@ -771,13 +812,15 @@ const FETCH_LATENCY = 1500;
     }
 
     function onMembersPage(data) {
-        var aNext = $(data).find(Selector.nextPage);
+        var aNext = $(data)
+            .find(Selector.nextPage);
 
         setNext(aNext);
 
         console.log("next page to fetch: " +
             getNext());
-        var users = $(data).find(Selector.users);
+        var users = $(data)
+            .find(Selector.users);
 
         $.each(users, (i, user) => {
             show(storeUser(user));
@@ -790,15 +833,15 @@ const FETCH_LATENCY = 1500;
                     fetchMembers(false);
                 }, (FETCH_LATENCY < 0 ? FETCH_LATENCY : 0)
             );
-        }
-        else {
+        } else {
             seekingEnded();
         }
     }
 
 
     function showInfo(str) {
-        $I('ShowCount').html(str);
+        $I('ShowCount')
+            .html(str);
     }
 
     function showCount() {
@@ -807,7 +850,8 @@ const FETCH_LATENCY = 1500;
 
     function show(n) {
         if(!filterUser(n)) {
-            $(listContainers[alternColumn]).append(members[n]);
+            $(listContainers[alternColumn])
+                .append(members[n]);
             _shownCount++;
             alternColumn = (alternColumn == (listContainers.length - 1)) ?
                 0 : (
@@ -837,25 +881,31 @@ const FETCH_LATENCY = 1500;
         var i = (members.push(user) - 1);
         // TODO add page num
         var matches = []; /* match: [whole, age (not null), gender, role ] */
-        var firstSpan = $(user).find(Selector.user.firstSpan);
+        var firstSpan = $(user)
+            .find(Selector.user.firstSpan);
         var C, into;
-        var avatar = $(user).find(Selector.user.imageAvatar);
+        var avatar = $(user)
+            .find(Selector.user.imageAvatar);
         mCache[i] = ['', 0, '', '', '', '', false, '', ''];
         C = mCache[i];
         /* name */
         C[0] = firstSpan.text();
         /** profile url */
-        C[5] = firstSpan.find(Selector.user.profileLink).attr('href');
+        C[5] = firstSpan.find(Selector.user.profileLink)
+            .attr('href');
         /** hasAvatar, need to be false if user has */
-        C[6] = (avatar.attr('src').indexOf('/images/avatar_missing') < 0) ?
+        C[6] = (avatar.attr('src')
+                .indexOf('/images/avatar_missing') < 0) ?
             true :
             false;
-            console.log($(user).find(Selector.user.shortDesc));
+        console.log($(user)
+            .find(Selector.user.shortDesc));
         matches = $(user)
-        .find(Selector.user.shortDesc).text()
-        .replace(/\n|\r/g,' ')
-        .replace(/\s{1,}|\n|\r/g,' ')
-        .match(userRegExp);
+            .find(Selector.user.shortDesc)
+            .text()
+            .replace(/\n|\r/g, ' ')
+            .replace(/\s{1,}|\n|\r/g, ' ')
+            .match(userRegExp);
         //   console.log("match: "+(M[1]||"")+", "+(M[2]||"")+", "+(M[3]||""));
         /* age */
         C[1] = matches[1];
@@ -864,12 +914,16 @@ const FETCH_LATENCY = 1500;
         /* role */
         C[3] = matches[3];
         /* location*/
-        C[4] = $(user).find(Selector.user.location).text() || '';
+        C[4] = $(user)
+            .find(Selector.user.location)
+            .text() || '';
         /* into */
         if(isFetishesPage) {
             matches = []; /* match: ["into status", "rest aka into activity" ] */
-            into = $(user).find(Selector.user.into).text() || '';
-            console.log('into: '+into);
+            into = $(user)
+                .find(Selector.user.into)
+                .text() || '';
+            console.log('into: ' + into);
             matches = into.match(regInto);
             console.log(matches);
             if(matches) {
@@ -922,14 +976,16 @@ const FETCH_LATENCY = 1500;
             console.log('_pageCurrentNo :' + _pageCurrentNo);
 
             drawBlock();
-            $I('FromPage').val(
-                useCurrentPageAsDefault ?
-                _pageCurrentNo :
-                1
-            );
+            $I('FromPage')
+                .val(
+                    useCurrentPageAsDefault ?
+                    _pageCurrentNo :
+                    1
+                );
             pageMax = lastPageNumber = getLastPageNum();
             console.log("lastPageNumber: " + lastPageNumber);
-            $I('ToPage').val(lastPageNumber);
+            $I('ToPage')
+                .val(lastPageNumber);
             setNext($pageNext);
             initListener();
         }
@@ -937,37 +993,47 @@ const FETCH_LATENCY = 1500;
 
     function showFilterAgain() {
 
-        $I('ButtonGo').val("filter\x20again");
+        $I('ButtonGo')
+            .val("filter again");
         enableAllInput();
 
-        $I('ButtonGo').bind('click', () => {
-            if(updatePaginationFilters()) {
-                launchAgain();
-                $(this).unbind('click');
-            }
-            else {
-                filterAgain();
-            }
-        });
+        $I('ButtonGo')
+            .bind('click', () => {
+                if(updatePaginationFilters()) {
+                    launchAgain();
+                    $(this)
+                        .unbind('click');
+                } else {
+                    filterAgain();
+                }
+            });
     }
 
     function initListener() {
-        $I('Controls').click(function () {
-            $I('Content').toggle("slow");
-            toggleMarker($(this).find('b:first'));
-        });
-        $I('ButtonCurrentPage').click(function () {
-            $I('FromPage').val(_pageCurrentNo);
-        });
-        $I('ButtonGo').click(function () {
-            $(this).unbind('click');
-            launchSearch();
+        $I('Controls')
+            .click(function () {
+                $I('Content')
+                    .toggle("slow");
+                toggleMarker($(this)
+                    .find('b:first'));
+            });
+        $I('ButtonCurrentPage')
+            .click(function () {
+                $I('FromPage')
+                    .val(_pageCurrentNo);
+            });
+        $I('ButtonGo')
+            .click(function () {
+                $(this)
+                    .unbind('click');
+                launchSearch();
 
-        });
-        $I('ButtonStop').click(function () {
-            // $(this).unbind('click');
-            stopped = true;
-        });
+            });
+        $I('ButtonStop')
+            .click(function () {
+                // $(this).unbind('click');
+                stopped = true;
+            });
     }
 
     function launchSearch() {
@@ -1016,8 +1082,7 @@ const FETCH_LATENCY = 1500;
     var count = 0;
     if(typeof $ == 'function') {
         init();
-    }
-    else {
+    } else {
         setTimeout(function () {
             if(typeof $ !== 'function') {
                 alert('fetlife is modified, script ' +
