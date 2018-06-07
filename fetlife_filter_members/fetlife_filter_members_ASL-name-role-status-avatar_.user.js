@@ -4,7 +4,7 @@
 // @description      greasemonkey script to filter fetlife members when it's possible. Search by name, gender, role, age, location or status.
 // @include          https://fetlife.com/*
 // @updateURL        https://github.com/bewam/userscripts/raw/master/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
-// @version          1.9.2.20183004
+// @version          1.9.2.20180607
 // @run-at           document-end
 // @include-jquery   false
 // @use-greasemonkey true
@@ -19,10 +19,13 @@ var onlyWithAvatar = true;
 /* care modifing
  * TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
  */
-const FETCH_LATENCY = 1500;
+const FETCH_LATENCY = 3000;
 // jshint ignore: start
 
-+(function ($) {
+forceNoAvatar = true;
+
++
+(function ($) {
     // jshint ignore: end
     // jquery str
     const Selector = {
@@ -158,7 +161,8 @@ const FETCH_LATENCY = 1500;
         unfolded: 'v'
     };
     const isFetishesPage = /^\/fetishes/.test(location.pathname);
-
+    const imageMissingData =
+        `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`;
     // NOTE: do not modify unless you know what you're doing.
     var overlay = (form) =>
         $(Selector.firstUser)
@@ -196,10 +200,12 @@ const FETCH_LATENCY = 1500;
         _shownCount = 0;
 
     /* store user html block index is shared with mCache */
-    /* todo */
-    var members = [],
-        /** NOTE mCache = ARRAY( { n° index: { [0]'name':'', [1]'age':XX, [2]'gender':WW, [3]'role':'', [4]'location':'', [5]url:'', [6]"hasAvatar":boolean } }) */
-        mCache = [],
+    /** NOTE  see initUserCache() for desc. */
+    var mCache = [],
+        /** referrer (pages) */
+        rCache = [],
+        /** image avatar data */
+        aCache = [],
         listContainers = [] // columns where lists appear
     ;
     //TODO Expressions =
@@ -258,7 +264,6 @@ const FETCH_LATENCY = 1500;
     /*-----------------------------------*/
 
     /*----------------html related--------------------------*/
-
     function buildOptions(arr1, arr2) {
         var str = '';
         $.each(arr1, function (i, v) {
@@ -797,11 +802,10 @@ const FETCH_LATENCY = 1500;
                 url: next,
                 dataType: 'html',
                 useCache: false,
-                xhrFields: {
-                    mozBackgroundRequest: true,
-                    withCredentials: false
+                success: (data) => {
+                    var pageIndex = storePage(next)
+                    onMembersPage(data, pageIndex);
                 },
-                success: onMembersPage,
                 error: function (event) {
                     seekingEnded();
                     console.error(event);
@@ -811,7 +815,7 @@ const FETCH_LATENCY = 1500;
         showCount();
     }
 
-    function onMembersPage(data) {
+    function onMembersPage(data, pIndex) {
         var aNext = $(data)
             .find(Selector.nextPage);
 
@@ -823,7 +827,9 @@ const FETCH_LATENCY = 1500;
             .find(Selector.users);
 
         $.each(users, (i, user) => {
-            show(storeUser(user));
+            var cacheIndex = initUserCache();
+            mCache[cacheIndex][9] = pIndex;
+            show(storeUser(cacheIndex, user));
         });
 
         if(!stopped && !isLastFetchedPage(getNext())) {
@@ -838,6 +844,56 @@ const FETCH_LATENCY = 1500;
         }
     }
 
+    function storePage(url) {
+        return(rCache.push(url) - 1);
+    }
+
+    function storeAvatar(src, userIndex) {
+
+        var C = mCache[userIndex];
+        var referrer = rCache[C[9]];
+
+
+        if(! C[6]) {
+            console.log('user "', C[0], '" has no avatar');
+            aCache[userIndex] = false;
+            return;
+        }
+
+        $.ajax({
+                url: src,
+                type: "GET",
+                headers: {
+                    "X-Alt-Referer": referrer
+                },
+                crossDomain: true,
+                xhrFields: {
+                    withCredentials: true,
+                    // responseType: 'blob'
+                },
+                success: function (data) {
+                    aCache[userIndex] = btoa(data);
+
+                    imgData = getAvatarData(userIndex);
+                    $('body')
+                        .prepend('img')
+                        .attr('src', imgData)
+                },
+                error: function (event) {
+                    seekingEnded();
+                    console.error(event);
+                }
+            })
+            .done(function () {
+                console.log("img success");
+            })
+            .fail(function () {
+                console.log("img error");
+            })
+            .always(function () {
+                console.log("img complete");
+            });
+    }
 
     function showInfo(str) {
         $I('ShowCount')
@@ -845,18 +901,62 @@ const FETCH_LATENCY = 1500;
     }
 
     function showCount() {
-        showInfo("members: " + _shownCount + " of " + members.length);
+        showInfo("members: " + _shownCount + " of " + mCache.length);
     }
 
     function show(n) {
+        var html;
         if(!filterUser(n)) {
+            html = drawMemberCard(n)
             $(listContainers[alternColumn])
-                .append(members[n]);
+                .append(html)
+            // console.log(html);
             _shownCount++;
             alternColumn = (alternColumn == (listContainers.length - 1)) ?
                 0 : (
                     alternColumn + 1);
         }
+    }
+
+    function drawMemberCard(userIndex) {
+        /* 0:name, 1:age, 2:gender, 3:role, 4:location, 5:profileURL, 6:hasAvatar, 7:status, 8:activity */
+        var C = mCache[userIndex];
+        var avatar = getAvatarData(userIndex);
+        var name = C[0];
+        var age = C[1];
+        var gender = C[2];
+        var role = C[3];
+        var location = C[4];
+        var profileURL = C[5];
+        var status = C[7];
+        var activity = C[8];
+        var memberCardHTML =
+            `<div class="fl-member-card fl-flag">
+        <div class="fl-flag__image">
+          <a class="fl-avatar__link" href="${profileURL}">
+          <img alt="${name}" title="${name}" class="fl-avatar__img" src="${avatar}" width="73" height="73"></a>
+        </div>
+        <div class="fl-flag__body">
+          <a class="fl-member-card__user" href="${profileURL}">${name}</a>
+          <span class="fl-member-card__info">
+            ${age}${gender}
+            ${role}
+          </span>
+          <span class="fl-member-card__location">
+            ${location}
+          </span>`;
+        memberCardHTML += isFetishesPage ?
+            `
+              <div class="fl-member-card__action">
+          
+              <span class="quiet small">
+                ${status} ${activity}
+              </span>
+              </div>` :
+            '';
+        memberCardHTML += `</div>
+      </div>`;
+        return memberCardHTML;
     }
     // TODO for 2.0
     // var Cache  = function () {}
@@ -875,75 +975,111 @@ const FETCH_LATENCY = 1500;
     //
     //     return this;
     // };
+    /**
+        0:name, 1:age, 2:gender, 3:role, 4:location, 5:profileURL, 6:hasAvatar, 7:status, 8:activity, 9(internal): pageCacheIndex 
+    **/
+    function initUserCache() {
+        var defaults = ['', 0, '', '', '', '', false, '', '', -1];
+        var cacheLen = mCache.push(defaults);
+        var userIndex = cacheLen - 1;
+        return userIndex;
+    }
 
-    function storeUser(user) {
-        console.log(user);
-        var i = (members.push(user) - 1);
-        // TODO add page num
-        var matches = []; /* match: [whole, age (not null), gender, role ] */
-        var firstSpan = $(user)
+    function getAvatarData(userIndex) {
+        var data = imageMissingData;
+
+        if(mCache[userIndex][6]) {
+            data = aCache[userIndex];
+        }
+        return "data:image/jpg;base64," + data;
+    }
+
+    function storeUser(cacheIndex, userData) {
+
+        var matches = [];
+        var firstSpan = $(userData)
             .find(Selector.user.firstSpan);
-        var C, into;
-        var avatar = $(user)
+        var C, into, src;
+        var $avatar = $(userData)
             .find(Selector.user.imageAvatar);
-        mCache[i] = ['', 0, '', '', '', '', false, '', ''];
-        C = mCache[i];
+
+        C = mCache[cacheIndex];
+
         /* name */
         C[0] = firstSpan.text();
         /** profile url */
-        C[5] = firstSpan.find(Selector.user.profileLink)
+        C[5] = $(userData)
+            .find(Selector.user.profileLink)
             .attr('href');
+
+        src = $avatar.attr('src')
+        console.log(src);
+
         /** hasAvatar, need to be false if user has */
-        C[6] = (avatar.attr('src')
-                .indexOf('/images/avatar_missing') < 0) ?
-            true :
-            false;
-        console.log($(user)
-            .find(Selector.user.shortDesc));
-        matches = $(user)
-            .find(Selector.user.shortDesc)
-            .text()
-            .replace(/\n|\r/g, ' ')
-            .replace(/\s{1,}|\n|\r/g, ' ')
-            .match(userRegExp);
-        //   console.log("match: "+(M[1]||"")+", "+(M[2]||"")+", "+(M[3]||""));
-        /* age */
-        C[1] = matches[1];
-        /* gender */
-        C[2] = matches[2];
-        /* role */
-        C[3] = matches[3];
-        /* location*/
-        C[4] = $(user)
-            .find(Selector.user.location)
-            .text() || '';
-        /* into */
-        if(isFetishesPage) {
-            matches = []; /* match: ["into status", "rest aka into activity" ] */
-            into = $(user)
-                .find(Selector.user.into)
-                .text() || '';
-            console.log('into: ' + into);
-            matches = into.match(regInto);
-            console.log(matches);
-            if(matches) {
-                C[7] = matches[1] || '';
-                C[8] = matches[2] || '';
+        if(! forceNoAvatar  && src.indexOf('/images/avatar_missing') < 0 ) {
+            C[6] = true;
+            storeAvatar(src, cacheIndex);
+        };
+        try {
+            var shortDesc = $(userData)
+                .find(Selector.user.shortDesc)
+                .text()
+                .replace(/\n|\r/g, ' ')
+                .replace(/\s{1,}|\n|\r/g, ' ');
+            console.log(shortDesc)
+            var matches = shortDesc.match(userRegExp);
+
+            if(matches.length < 2) {
+                return;
             }
-            //     console.log("mCache[i][7] = "+C[7]+"  &&  mCache[i][8] = "+C[8])
+            /* age */
+            C[1] = matches[1];
+            /* gender */
+            C[2] = matches[2];
+            /* role */
+            C[3] = matches[3];
+            /* location*/
+            C[4] = $(userData)
+                .find(Selector.user.location)
+                .text() || '';
+            /* into */
+            if(isFetishesPage) {
+                matches = []; /* match: ["into status", "rest aka into activity" ] */
+                into = $(userData)
+                    .find(Selector.user.into)
+                    .text() || '';
+                // console.log('into: ' + into);
+                matches = into.match(regInto);
+                // console.log(matches);
+                if(matches) {
+                    C[7] = matches[1] || '';
+                    C[8] = matches[2] || '';
+                }
+                //     console.log("mCache[i][7] = "+C[7]+"  &&  mCache[i][8] = "+C[8])
+            }
+        } catch(err) {
+            console.log(err.message);
+            throw(new Error(err.message));
         }
         console.log(C);
-        return i;
+        return cacheIndex;
     }
 
-    function initCache() {
-        M = []; // TODO undef ?
-        members = [];
+    function initCaches() {
+        // referrer data to get avatars
+        rCache = [];
+        // avatars DATA
+        aCache = [];
+        // members
         mCache = [];
     }
 
     function clearCache() {
-        members = [];
+        // referrer data to get avatars
+        rCache = [];
+        // avatars DATA
+        aCache = [];
+        // members
         mCache = [];
     }
 
@@ -1064,14 +1200,14 @@ const FETCH_LATENCY = 1500;
         updateMemberFilters();
         updateAvatarFilter();
         cleanPage();
-        for(var i = 0; i < members.length; i++) {
+        for(var i = 0; i < mCache.length; i++) {
             show(i);
         }
         showCount();
     }
     /** due to recursive function*/
     function seekingEnded() {
-        console.log("total members: " + members.length);
+        console.log("total members: " + mCache.length);
         ajaxLocked = false;
         stopped = false;
         enableAllInput();
