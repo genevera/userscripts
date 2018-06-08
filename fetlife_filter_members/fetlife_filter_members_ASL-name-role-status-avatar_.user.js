@@ -4,7 +4,7 @@
 // @description      greasemonkey script to filter fetlife members when it's possible. Search by name, gender, role, age, location or status.
 // @include          https://fetlife.com/*
 // @updateURL        https://github.com/bewam/userscripts/raw/master/fetlife_filter_members/fetlife_filter_members_ASL-name-role-status-avatar_.user.js
-// @version          1.9.2.20180607
+// @version          1.9.2.20180608
 // @run-at           document-end
 // @include-jquery   false
 // @use-greasemonkey true
@@ -15,14 +15,14 @@
 /*console = { log: ()=>{}}; /**/
 
 var useCurrentPageAsDefault = false;
-var onlyWithAvatar = true;
+var onlyWithAvatar = false; //actual default see #4 on github
 /* care modifing
  * TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
  */
 const FETCH_LATENCY = 3000;
 // jshint ignore: start
 
-forceNoAvatar = true;
+const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
 
 +
 (function ($) {
@@ -53,6 +53,7 @@ forceNoAvatar = true;
     const ARRAY_GENDER = [
         'M',
         'F',
+        'NB',
         'CD/TV',
         'MtF',
         'FtM',
@@ -66,6 +67,7 @@ forceNoAvatar = true;
     const ARRAY_GENDER_LABEL = [
         'Male',
         'Female',
+        'Non-Binary'
         'CD/TV',
         'Trans-MtF', 'Trans-FtM',
         'Transgender',
@@ -140,7 +142,21 @@ forceNoAvatar = true;
         'Evolving',
         'Exploring',
         'Vanilla',
-        'Undecided'
+        'Undecided',
+        'Handler',
+        'Disciplinarian',
+        'Drag King',
+        'Drag Queen',
+        'Toy',
+        'Cougar',
+        'Middle',
+        'Hotwife',
+        'Cuckoldress',
+        'Leatherman',
+        'Leather Mommy',
+        'Leatherboy',
+        'Leathergirl',
+        'Leatherboi'
     ];
     const ARRAY_ROLE_LABEL = ARRAY_ROLE;
     const ARRAY_INTO_STATUS = [
