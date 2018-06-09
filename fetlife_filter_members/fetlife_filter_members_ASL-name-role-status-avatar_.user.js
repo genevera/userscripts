@@ -67,7 +67,7 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
     const ARRAY_GENDER_LABEL = [
         'Male',
         'Female',
-        'Non-Binary'
+        'Non-Binary',
         'CD/TV',
         'Trans-MtF', 'Trans-FtM',
         'Transgender',
