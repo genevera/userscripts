@@ -372,8 +372,8 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
             // '" ></input>' +
             '        <input type="checkbox" id="' + S('HasAvatar') +
             '" name="' + S(
-                'HasAvatar') + '" checked="' + (onlyWithAvatar ? 'true' :
-                'false') + '"></input>' +
+                'HasAvatar') + '" ' + (onlyWithAvatar ? 'checked="true"' :
+                'false') + '></input>' +
             '        <label for="' + S('HasAvatar') +
             '">only with avatar</label>' +
             '        <br />' +
