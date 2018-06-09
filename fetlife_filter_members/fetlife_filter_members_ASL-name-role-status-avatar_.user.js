@@ -19,13 +19,12 @@ var onlyWithAvatar = false; //actual default see #4 on github
 /* care modifing
  * TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
  */
-const FETCH_LATENCY = 3000;
+const FETCH_LATENCY = 2000;
 // jshint ignore: start
 
 const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
 
-+
-(function ($) {
++(function ($) {
     // jshint ignore: end
     // jquery str
     const Selector = {
@@ -273,7 +272,9 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
         '#' + S('ButtonStop') + '{ ' +
         // 'display: none;' +
         '}' +
-        ''
+        `.flfm-has-avatar{
+            border: solid 1px red;
+        }`
     );
     /* jshint ignore:end */
 
@@ -944,11 +945,12 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
         var role = C[3];
         var location = C[4];
         var profileURL = C[5];
+        var hasAvatarClass = C[6] ? 'flfm-has-avatar':'';
         var status = C[7];
         var activity = C[8];
         var memberCardHTML =
             `<div class="fl-member-card fl-flag">
-        <div class="fl-flag__image">
+        <div class="fl-flag__image ${hasAvatarClass}">
           <a class="fl-avatar__link" href="${profileURL}">
           <img alt="${name}" title="${name}" class="fl-avatar__img" src="${avatar}" width="73" height="73"></a>
         </div>
@@ -1032,9 +1034,11 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
         console.log(src);
 
         /** hasAvatar, need to be false if user has */
-        if(! forceNoAvatar  && src.indexOf('/images/avatar_missing') < 0 ) {
+        if(src.indexOf('/images/avatar_missing') < 0 ) {
             C[6] = true;
-            storeAvatar(src, cacheIndex);
+            if (! forceNoAvatar  ) {
+                storeAvatar(src, cacheIndex);
+            }
         };
         try {
             var shortDesc = $(userData)
