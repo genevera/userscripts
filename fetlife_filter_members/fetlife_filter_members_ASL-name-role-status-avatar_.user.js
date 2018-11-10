@@ -16,6 +16,7 @@ console = { log: ()=>{}}; /**/
 
 var useCurrentPageAsDefault = false;
 var onlyWithAvatar = false; //actual default see #4 on github
+var M; 
 /* care modifing
  * TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
  */
@@ -59,6 +60,7 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
         'TG',
         'GF',
         'GQ',
+        'NB',
         'IS',
         'B',
         'FEM'
@@ -72,6 +74,7 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
         'Transgender',
         'Gender Fluid',
         'Genderqueer',
+        'NB',
         'Intersex',
         'Butch',
         'Femme'
@@ -1053,11 +1056,11 @@ const forceNoAvatar = true;// see #4 on github du to fetlife restriction + ajax
                 return;
             }
             /* age */
-            C[1] = matches[1];
+            C[1] = matches[1] || '';
             /* gender */
-            C[2] = matches[2];
+            C[2] = matches[2] || '';
             /* role */
-            C[3] = matches[3];
+            C[3] = matches[3] || '';
             /* location*/
             C[4] = $(userData)
                 .find(Selector.user.location)
