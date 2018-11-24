@@ -16,7 +16,7 @@ console = { log: ()=>{}}; /**/
 
 var useCurrentPageAsDefault = false;
 var onlyWithAvatar = false; //actual default see #4 on github
-var M; 
+
 /* care modifing
  * TODO : to be removed: https://greasyfork.org/fr/forum/discussion/4199/lock-a-script#latest
  */
